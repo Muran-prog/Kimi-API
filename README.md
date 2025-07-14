@@ -1,6 +1,3 @@
-Of course, here is a comprehensive `Readme.md` file in English with detailed documentation and examples, formatted for display on GitHub.
-
----
 
 # Kimi AI Engine
 
