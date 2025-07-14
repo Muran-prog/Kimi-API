@@ -1,3 +1,6 @@
+Added on 14.07.2025 (Note: there may be changes in the architecture of requests, which may cause the engine to stop working. In case of possible malfunction, I advise you to manually rewrite the logic of replacing requests with fresh ones (through reverse engineering).
+
+---
 
 # Kimi AI Engine
 
