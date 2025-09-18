@@ -1,309 +1,179 @@
-Added on 14.07.2025 (Note: there may be changes in the architecture of requests, which may cause the engine to stop working. In case of possible malfunction, I advise you to manually rewrite the logic of replacing requests with fresh ones (through reverse engineering).
+# Kimi AI Unofficial Python API
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Status](https://img.shields.io/badge/status-unofficial-red)]()
+
+A high-quality, asynchronous, and unofficial Python library for interacting with the Kimi AI API. This library provides a robust, reusable, and framework-agnostic engine for communicating with Kimi AI (from Moonshot AI), designed for easy integration into any project.
+
+The entire project is built with a clean, modular architecture, focusing on readability, maintainability, and a great developer experience.
+
+**Repository:** [https://github.com/Muran-prog/Kimi-API.git](https://github.com/Muran-prog/Kimi-API.git)
 
 ---
 
-# Kimi AI Engine
+### Disclaimer
 
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg?style=flat-square)](https://www.python.org/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](https://opensource.org/licenses/MIT)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg?style=flat-square)](https://github.com/psf/black)
+This is an unofficial library and is **not affiliated with, endorsed, or sponsored by Moonshot AI (Kimi AI's parent company) in any way.** It is a reverse-engineered client that interacts with Kimi's internal web API. The API is undocumented and may change at any time without notice, which could cause this library to break. Use this software at your own risk. The developers are not responsible for any issues, damages, or account actions that may result from its use.
 
-A high-quality, asynchronous, and framework-agnostic Python library for interacting with the Kimi AI API.
+---
 
-This engine is designed for robust and efficient communication with Kimi AI, making it easy to integrate into any commercial or open-source project. It handles session management, authentication, file uploads, and streaming chat responses with a clean, modern `asyncio`-based API.
+### ⚠️ Important Notice
 
-## ✨ Key Features
+> **Added on 14.07.2025:** Note: there may be changes in the architecture of requests, which may cause the engine to stop working. In case of possible malfunction, I advise you to manually rewrite the logic of replacing requests with fresh ones (through reverse engineering).
 
-*   **Pure Asynchronous:** Built from the ground up with `asyncio` and `curl_cffi` for high performance.
-*   **Clean Architecture:** Clear separation of concerns between the `KimiAIEngine` (for session management and file uploads) and the `KimiChat` (for conversations).
-*   **Robust Error Handling:** A comprehensive set of custom exceptions (`APIError`, `AuthenticationError`, etc.) for predictable error management.
-*   **Typed & Structured Responses:** Uses Python `dataclasses` for API responses, providing a predictable structure and excellent editor support (autocompletion, type checking).
-*   **Full Session Configuration:** Easily configure proxies, request timeouts, and browser impersonation settings.
-*   **Secure & Graceful Shutdown:** Includes an async context manager (`async with`) to ensure network sessions are always closed properly.
-*   **Comprehensive Logging:** Integrated logging helps with debugging and monitoring application behavior.
-*   **Multi-Step File Uploads:** A single `upload_file` method abstracts the entire multi-step process of uploading and processing documents and images.
+---
 
-## 📋 Prerequisites
+## ✅ Key Features
 
-1.  **Python 3.8 or higher.**
-2.  An active account on [Kimi.com](https://www.kimi.com/).
-3.  A `cookies.txt` file exported from your browser after logging into Kimi.
+-   **Pure Asynchronous:** Built from the ground up with `asyncio` and `curl_cffi` for high performance and non-blocking I/O.
+-   **Clean Modular Architecture:** Code is logically separated into modules for exceptions, data models, the core engine, and chat handling.
+-   **Robust Error Handling:** A clear hierarchy of custom exceptions for predictable error management.
+-   **Typed & Structured Responses:** Uses Python `dataclasses` for API responses, providing type safety and autocompletion instead of raw dictionaries.
+-   **Full File Upload Support:** A complete, multi-step implementation for uploading documents and images to be used as context in conversations.
+-   **Streaming Completions:** Efficiently handle long responses by processing them chunk-by-chunk as they arrive.
+-   **Full Session Configuration:** Easily configure cookies, proxies, and timeouts.
+-   **Safe Session Management:** Uses an async context manager (`async with`) for guaranteed session cleanup.
+-   **Excellent Developer Experience:** Detailed docstrings and full type hinting for a smooth development process.
 
 ## ⚙️ Installation
 
-The library depends on `curl_cffi` for its performance and ability to impersonate browser TLS fingerprints.
+This library is not on PyPI. You can install it directly from GitHub.
 
-```bash
-pip install curl_cffi
-```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Muran-prog/Kimi-API.git
+    cd Kimi-API
+    ```
+
+2.  **Create and activate a virtual environment (recommended):**
+    ```bash
+    python -m venv venv
+    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
+    ```
+
+3.  **Install the required dependencies:**
+    You'll need `curl_cffi` for its ability to impersonate browser TLS fingerprints, which is crucial for avoiding blocks.
+    ```bash
+    pip install curl_cffi
+    ```
 
 ## 🔑 Authentication: Getting Your `cookies.txt`
 
-The engine authenticates by using the same cookies as your web browser. You need to export them to a file.
+The library authenticates by using your browser's session cookies. You need to export them into a `cookies.txt` file in the Netscape format.
 
-1.  **Log in** to your account on [www.kimi.com](https://www.kimi.com/).
-2.  **Use a browser extension** to export your cookies. We recommend:
-    *   [Get cookies.txt LOCALLY](https://chrome.google.com/webstore/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc) for Chrome/Edge.
-    *   [cookies.txt](https://addons.mozilla.org/en-US/firefox/addon/cookies-txt/) for Firefox.
-3.  Click the extension's icon and use the "Export" or "Download" button to save the `cookies.txt` file for the `kimi.com` domain.
-4.  **Save the file** in your project's root directory (or another path you can reference) with the name `cookies.txt`.
+1.  Log in to your account on [www.kimi.com](https://www.kimi.com) in your web browser (e.g., Chrome, Firefox).
+2.  Install a browser extension that can export cookies in the Netscape format. A recommended extension for Chrome is **"Get cookies.txt LOCALLY"**.
+3.  With the Kimi AI website open, click the extension's icon and export the cookies.
+4.  Save the downloaded file as `cookies.txt` in the root directory of this project.
 
-> **Security Warning:** Your `cookies.txt` file contains sensitive session tokens. **Do not share this file or commit it to version control.** Always add `cookies.txt` to your `.gitignore` file.
->
-> ```
-> # .gitignore
-> cookies.txt
-> ```
+**Important:** Your `cookies.txt` file must contain the `kimi-auth` cookie for the library to work.
 
-## 🚀 Usage Examples
+## 🚀 Quick Start Example
 
-### 1. Basic Setup and Sending a Message
-
-This example shows how to initialize the engine, create a new chat, send a message, and print the streamed response chunks.
+The following example demonstrates how to initialize the engine, create a chat, upload a file, and stream a response.
 
 ```python
+# example.py
 import asyncio
-from KimiAIEngine import KimiAIEngine, KimiException, CompletionChunk
+import logging
+import os
+
+# Import classes directly from the kimiai package
+from kimiai import (APIError, AuthenticationError, CompletionChunk,
+                    FileUploadError, KimiAIEngine, KimiException, SearchInfo,
+                    StatusUpdate)
+
 
 async def main():
-    """Main function to run the Kimi AI Engine."""
-    try:
-        # The engine is best used with an async context manager
-        async with KimiAIEngine(cookies_path='cookies.txt') as engine:
-            # 1. Create a new chat session on the Kimi backend
-            chat = await engine.create_chat(name="My First Chat")
-            print(f"Created chat with ID: {chat.chat_id}")
+    """Demonstrates the core functionality of the KimiAIEngine."""
+    # Configure logging to see the library's output
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
 
-            # 2. Define a prompt
-            prompt = "Hello, Kimi! Can you explain the theory of relativity in simple terms?"
-            
-            # 3. Send the message and stream the response
-            print(f"\nUser: {prompt}")
-            print("Kimi's Response: ", end="", flush=True)
-            
+    if not os.path.exists('cookies.txt'):
+        print("Error: 'cookies.txt' not found.")
+        return
+
+    try:
+        # The engine is an async context manager for safe session handling
+        async with KimiAIEngine(cookies_path='cookies.txt') as engine:
+            # 1. Create a new chat
+            print("Creating a new chat...")
+            chat = await engine.create_chat(name="My First API Chat")
+            print(f"Chat created with ID: {chat.chat_id}")
+
+            # 2. (Optional) Upload a file for context
+            dummy_file_path = "sample_document.txt"
+            with open(dummy_file_path, "w", encoding="utf-8") as f:
+                f.write("This is a test document to be analyzed by Kimi AI.")
+
+            print(f"\nUploading file: {dummy_file_path}...")
+            file_ids = []
+            prompt = "Hello, Kimi! Can you tell me a joke about programming?"
+            try:
+                uploaded_file = await engine.upload_file(dummy_file_path)
+                print(f"File uploaded successfully! ID: {uploaded_file.id}")
+                file_ids.append(uploaded_file.id)
+                prompt = "Please summarize the content of the document I've just uploaded."
+            except FileUploadError as e:
+                print(f"File upload failed: {e}")
+            finally:
+                os.remove(dummy_file_path) # Clean up
+
+            # 3. Send a message and stream the response
+            print(f"\nSending prompt: '{prompt}'")
+            print("Streaming response from Kimi:")
+            print("-" * 30)
+
             full_response = ""
-            async for event in chat.send_message_stream(prompt=prompt):
+            async for event in chat.send_message_stream(prompt, file_ids=file_ids):
                 if isinstance(event, CompletionChunk):
-                    # Print the text chunk as it arrives
                     print(event.text, end="", flush=True)
                     full_response += event.text
-            
-            print("\n\n--- End of Stream ---")
+                elif isinstance(event, SearchInfo):
+                    print(f"\n[Kimi is searching: {event.search_type}]")
+                # Handle other event types if needed
 
+            print("\n" + "-" * 30)
+            print("\nFull response received.")
+
+    except AuthenticationError as e:
+        print(f"\nERROR: Authentication failed: {e}")
+    except APIError as e:
+        print(f"\nERROR: An API error occurred: {e}")
     except KimiException as e:
-        print(f"\nAn error occurred: {e}")
+        print(f"\nERROR: An unexpected library error occurred: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-### 2. Managing Conversation History
+## 🏛️ Project Structure
 
-To have a continuous conversation, you can pass the previous messages as history.
+The codebase is organized into a clean, modular structure within the `kimiai/` package directory:
 
-```python
-import asyncio
-from KimiAIEngine import KimiAIEngine, KimiMessage, CompletionChunk
-
-async def run_conversation():
-    async with KimiAIEngine() as engine:
-        chat = await engine.create_chat(name="History Demo")
-        
-        # Keep track of the conversation
-        conversation_history = []
-        
-        # --- First message ---
-        prompt1 = "What is the capital of France?"
-        print(f"User: {prompt1}")
-        print("Kimi: ", end="")
-        
-        response1 = ""
-        async for chunk in chat.send_message_stream(prompt=prompt1):
-            if isinstance(chunk, CompletionChunk):
-                print(chunk.text, end="")
-                response1 += chunk.text
-        print("\n")
-        
-        # Add both user prompt and assistant response to history
-        conversation_history.append(KimiMessage(role="user", content=prompt1))
-        conversation_history.append(KimiMessage(role="assistant", content=response1))
-        
-        # --- Second message (with history) ---
-        prompt2 = "What about its main attractions?"
-        print(f"User: {prompt2}")
-        print("Kimi: ", end="")
-        
-        # Pass the history to maintain context
-        async for chunk in chat.send_message_stream(prompt=prompt2, history=conversation_history):
-            if isinstance(chunk, CompletionChunk):
-                print(chunk.text, end="")
-        print("\n")
-
-if __name__ == "__main__":
-    asyncio.run(run_conversation())
 ```
+kimiai/
+├── __init__.py      # Makes the directory a package and exposes public classes.
+├── engine.py        # Contains the main KimiAIEngine for session management and top-level actions.
+├── chat.py          # Contains the KimiChat class for handling individual conversations.
+├── models.py        # Defines all dataclasses for structured API responses (e.g., UploadedFile, CompletionChunk).
+└── exceptions.py    # Defines all custom exceptions for clear error handling.
 
-### 3. Uploading and Referencing a File
-
-The engine can upload documents (`.pdf`, `.docx`, `.txt`) or images and reference them in a prompt.
-
-```python
-import asyncio
-import os
-from KimiAIEngine import KimiAIEngine, FileUploadError, CompletionChunk
-
-# Create a dummy file for the example
-DUMMY_FILE_PATH = "project_summary.txt"
-with open(DUMMY_FILE_PATH, "w") as f:
-    f.write("Project Titan is a new initiative to build a next-generation AI using Python and Rust.")
-
-async def analyze_document():
-    try:
-        async with KimiAIEngine() as engine:
-            print(f"Uploading file: {DUMMY_FILE_PATH}...")
-            
-            # 1. Upload the file
-            uploaded_file = await engine.upload_file(file_path=DUMMY_FILE_PATH)
-            print(f"File uploaded successfully! File ID: {uploaded_file.id}")
-
-            # 2. Create a chat and reference the file
-            chat = await engine.create_chat(name="Document Analysis")
-            prompt = "Please summarize the attached document in one sentence."
-            
-            print(f"\nUser: {prompt}")
-            print("Kimi: ", end="")
-
-            # 3. Pass the file ID in the `file_ids` list
-            async for chunk in chat.send_message_stream(prompt=prompt, file_ids=[uploaded_file.id]):
-                if isinstance(chunk, CompletionChunk):
-                    print(chunk.text, end="")
-            print("\n")
-
-    except FileUploadError as e:
-        print(f"File upload failed: {e}")
-    except FileNotFoundError:
-        print(f"Error: The file {DUMMY_FILE_PATH} was not found.")
-    finally:
-        # Clean up the dummy file
-        if os.path.exists(DUMMY_FILE_PATH):
-            os.remove(DUMMY_FILE_PATH)
-
-if __name__ == "__main__":
-    asyncio.run(analyze_document())
-```
-
-### 4. Robust Error Handling
-
-Here is how you can catch the custom exceptions raised by the library.
-
-```python
-import asyncio
-from KimiAIEngine import KimiAIEngine, KimiException, APIError, AuthenticationError
-
-async def handle_errors():
-    try:
-        # Intentionally use a wrong path for cookies to trigger an error
-        async with KimiAIEngine(cookies_path='non_existent_cookies.txt') as engine:
-            await engine.create_chat()
-            
-    except AuthenticationError as e:
-        print(f"Caught an Authentication Error: {e}")
-        print("Please ensure your 'cookies.txt' file is correct and accessible.")
-
-    except APIError as e:
-        print(f"Caught an API Error (Status: {e.status_code}): {e}")
-        print(f"Response Body: {e.response_text}")
-        
-    except KimiException as e:
-        # This is the base exception, catching any library-specific error
-        print(f"A general Kimi Engine error occurred: {e}")
-
-if __name__ == "__main__":
-    asyncio.run(handle_errors())
-```
-
-## 📚 API Documentation
-
-### Class `KimiAIEngine`
-
-This is the main class for managing sessions and high-level operations.
-
-*   `__init__(self, cookies_path: str = 'cookies.txt', impersonate: str = "chrome110", timeout: int = 45, proxies: Optional[Dict[str, str]] = None)`
-    *   `cookies_path`: Path to your Netscape format `cookies.txt` file.
-    *   `impersonate`: The browser to impersonate for the TLS fingerprint (see `curl_cffi` docs). Defaults to `chrome110`.
-    *   `timeout`: Default timeout for HTTP requests in seconds.
-    *   `proxies`: A dictionary for proxies (e.g., `{'http': '...', 'https': '...'}`).
-
-*   `async def create_chat(self, name: str = "New Chat") -> KimiChat`:
-    Creates a new chat session on the Kimi backend and returns a `KimiChat` instance to interact with it.
-
-*   `async def upload_file(self, file_path: str) -> UploadedFile`:
-    Handles the entire file upload process and returns an `UploadedFile` dataclass containing the file's ID and metadata.
-
-*   `async def close(self)`:
-    Closes the underlying network session. Automatically called when using `async with`.
-
-### Class `KimiChat`
-
-Represents a single conversation and is used to send messages. It should only be created via `engine.create_chat()`.
-
-*   `async def send_message_stream(...) -> AsyncGenerator[...]`:
-    Sends a message to the chat and returns an async generator that yields stream events.
-    *   **Parameters**:
-        *   `prompt` (str): The user's message.
-        *   `history` (List[KimiMessage], optional): A list of previous `KimiMessage` objects for context.
-        *   `use_search` (bool, optional): Whether to allow Kimi to use web search. Defaults to `True`.
-        *   `file_ids` (List[str], optional): A list of file IDs from `upload_file` to reference.
-    *   **Yields**:
-        *   `CompletionChunk`: A piece of the response text.
-        *   `SearchInfo`: Metadata about web searches performed by the AI.
-        *   `StatusUpdate`: An event indicating the stream is finished (`'done'`).
-
-### Data Classes
-
-*   `KimiMessage(role: str, content: str)`: Represents a message in the conversation history. `role` is either `"user"` or `"assistant"`.
-*   `UploadedFile(id: str, ...)`: Contains metadata about a successfully uploaded file.
-*   `StreamEvent(event: str)`: The base class for all streamed events.
-    *   `CompletionChunk(text: str)`
-    *   `SearchInfo(hallucination: dict, ...)`
-    *   `StatusUpdate()`
-
-### Exceptions
-
-*   `KimiException`: Base exception for all library errors.
-*   `AuthenticationError`: Raised if `cookies.txt` is missing or invalid.
-*   `APIError`: Raised for non-2xx HTTP responses from the Kimi API.
-*   `FileUploadError`: Raised if any step of the file upload process fails.
-
-## 📝 Logging
-
-The library uses Python's standard `logging` module. You can configure the logger in your application to control the output level.
-
-```python
-import logging
-
-# Set the logging level to INFO to see session initialization messages
-logging.basicConfig(level=logging.INFO)
-
-# Or get the specific logger for more granular control
-# logger = logging.getLogger('KimiAIEngine')
-# logger.setLevel(logging.DEBUG) # Very verbose output for debugging
+example.py           # A script demonstrating how to use the library.
 ```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to fork the repository, make your changes, and submit a pull request.
+Contributions are welcome! If you find a bug, have a feature request, or want to improve the code, please feel free to:
 
-1.  Fork the repository.
-2.  Create a new branch (`git checkout -b feature/your-feature-name`).
-3.  Commit your changes (`git commit -am 'Add some feature'`).
-4.  Push to the branch (`git push origin feature/your-feature-name`).
-5.  Create a new Pull Request.
+1.  Open an issue to discuss the change.
+2.  Fork the repository and create a new branch.
+3.  Make your changes and submit a pull request.
 
-## 📄 License
+## 📜 License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Disclaimer
-
-This is an unofficial, third-party library and is not affiliated with, endorsed, or sponsored by Moonshot AI or the Kimi AI team. It is a community-driven project intended for research and development purposes.
